@@ -20,10 +20,10 @@
         {
           "model-name": "gpt-oss-20b",
           "base-url": "http://127.0.0.1:8080/v1",
-          "command": "/Users/pooriayousefi/llama.cpp/build/bin/llama-server",
+          "command": "/path/to/llama-server",
           "args": [
             "--model",
-            "/Users/pooriayousefi/llms/gpt-oss-20b-UD-Q6_K_XL.gguf",
+            "/path/to/models/gpt-oss-20b-UD-Q6_K_XL.gguf",
             "--host",
             "127.0.0.1",
             "--port",
@@ -53,12 +53,12 @@
         {
           "model-name": "glm-ocr",
           "base-url": "http://127.0.0.1:8081/v1",
-          "command": "/Users/pooriayousefi/llama.cpp/build/bin/llama-server",
+          "command": "/path/to/llama-server",
           "args": [
             "--model",
-            "/Users/pooriayousefi/llms/GLM-OCR/GLM-OCR-f16.gguf",
+            "/path/to/models/GLM-OCR/GLM-OCR-f16.gguf",
             "--mmproj",
-            "/Users/pooriayousefi/llms/GLM-OCR/mmproj-GLM-OCR-Q8_0.gguf",
+            "/path/to/models/GLM-OCR/mmproj-GLM-OCR-Q8_0.gguf",
             "--host",
             "127.0.0.1",
             "--port",
@@ -86,14 +86,14 @@
         {
           "model-name": "gemma-4-12b",
           "base-url": "http://127.0.0.1:8082/v1",
-          "command": "/Users/pooriayousefi/llama.cpp/build/bin/llama-server",
+          "command": "/path/to/llama-server",
           "args": [
             "--model",
-            "/Users/pooriayousefi/llms/gemma-4/gemma-4-12b-it-UD-Q8_K_XL.gguf",
+            "/path/to/models/gemma-4/gemma-4-12b-it-UD-Q8_K_XL.gguf",
             "--mmproj",
-            "/Users/pooriayousefi/llms/gemma-4/mmproj-F32.gguf",
+            "/path/to/models/gemma-4/mmproj-F32.gguf",
             "--model-draft",
-            "/Users/pooriayousefi/llms/gemma-4/mtp-gemma-4-12B-it.gguf",
+            "/path/to/models/gemma-4/mtp-gemma-4-12B-it.gguf",
             "--ctx-size",
             "65536",
             "--batch-size",
