@@ -1,0 +1,22 @@
+SAURON project layout
+=====================
+
+README.md                         Tutorial and build/run guide
+.gitignore                        Generated files and local metadata exclusions
+cfg/
+  ai_providers.json              LLM provider/model configuration
+  mcp_servers.json               MCP server commands and transports
+  system_prompts.json            Agent system prompts
+include/
+  cpp-httplib/httplib.h          Vendored HTTP library
+  nlohmann/json.hpp              Vendored JSON library
+  pooriayousefi/
+    mcp/                         MCP clients, servers, protocol, and transports
+    process/                     Cross-platform process and IPC helpers
+    sauron/                      Agent runtime and LLM client
+    utility/                     Shared types and Expected result type
+src/
+  sauron.cpp                     SAURON interactive runtime
+  server/                        Nine standalone MCP tool-server executables
+  test/                          MCP and agent executable demos
+bin/                             Build output directory (ignored by Git)

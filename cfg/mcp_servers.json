@@ -1,0 +1,148 @@
+{
+  "mcp_servers": [
+    {
+      "name": "file",
+      "transports": {
+        "stdio": {
+          "enable": true,
+          "command": "bin/file_mcp_tool_server",
+          "args": [],
+          "env": {}
+        },
+        "http": {
+          "enable": false,
+          "host": "127.0.0.1",
+          "port": 8093
+        }
+      }
+    },
+    {
+      "name": "directory",
+      "transports": {
+        "stdio": {
+          "enable": true,
+          "command": "bin/directory_mcp_tool_server",
+          "args": [],
+          "env": {}
+        },
+        "http": {
+          "enable": false,
+          "host": "127.0.0.1",
+          "port": 8094
+        }
+      }
+    },
+    {
+      "name": "shell",
+      "transports": {
+        "stdio": {
+          "enable": true,
+          "command": "bin/shell_mcp_tool_server",
+          "args": [],
+          "env": {}
+        },
+        "http": {
+          "enable": false,
+          "host": "127.0.0.1",
+          "port": 8090
+        }
+      }
+    },
+    {
+      "name": "time",
+      "transports": {
+        "stdio": {
+          "enable": true,
+          "command": "bin/time_mcp_tool_server",
+          "args": [],
+          "env": {}
+        },
+        "http": {
+          "enable": false,
+          "host": "127.0.0.1",
+          "port": 8091
+        }
+      }
+    },
+    {
+      "name": "git",
+      "transports": {
+        "stdio": {
+          "enable": true,
+          "command": "bin/git_mcp_tool_server",
+          "args": [],
+          "env": {}
+        },
+        "http": {
+          "enable": false,
+          "host": "127.0.0.1",
+          "port": 8099
+        }
+      }
+    },
+    {
+      "name": "random-number",
+      "transports": {
+        "stdio": {
+          "enable": true,
+          "command": "bin/random_number_mcp_tool_server",
+          "args": [],
+          "env": {}
+        },
+        "http": {
+          "enable": false,
+          "host": "127.0.0.1",
+          "port": 8095
+        }
+      }
+    },
+    {
+      "name": "statistics",
+      "transports": {
+        "stdio": {
+          "enable": true,
+          "command": "bin/statistics_mcp_tool_server",
+          "args": [],
+          "env": {}
+        },
+        "http": {
+          "enable": false,
+          "host": "127.0.0.1",
+          "port": 8096
+        }
+      }
+    },
+    {
+      "name": "memory",
+      "transports": {
+        "stdio": {
+          "enable": true,
+          "command": "bin/memory_mcp_tool_server",
+          "args": [],
+          "env": {}
+        },
+        "http": {
+          "enable": false,
+          "host": "127.0.0.1",
+          "port": 8097
+        }
+      }
+    },
+    {
+      "name": "utility",
+      "transports": {
+        "stdio": {
+          "enable": true,
+          "command": "bin/utility_mcp_tool_server",
+          "args": [],
+          "env": {}
+        },
+        "http": {
+          "enable": false,
+          "host": "127.0.0.1",
+          "port": 8098
+        }
+      }
+    }
+  ]
+}

@@ -1,0 +1,123 @@
+{
+  "providers": [
+    {
+      "name": "openai",
+      "type": "openai-compatible",
+      "api-key-env": "OPENAI_API_KEY",
+      "models": [
+        {
+          "model-name": "gpt-6-luna",
+          "base-url": "https://api.openai.com/v1",
+          "temp": 0.7,
+          "max-tokens": 4096
+        }
+      ]
+    },
+    {
+      "name": "llama-server",
+      "type": "openai-compatible",
+      "models": [
+        {
+          "model-name": "gpt-oss-20b",
+          "base-url": "http://127.0.0.1:8080/v1",
+          "command": "/Users/pooriayousefi/llama.cpp/build/bin/llama-server",
+          "args": [
+            "--model",
+            "/Users/pooriayousefi/llms/gpt-oss-20b-UD-Q6_K_XL.gguf",
+            "--host",
+            "127.0.0.1",
+            "--port",
+            "8080",
+            "--ctx-size",
+            "65536",
+            "--batch-size",
+            "1024",
+            "--n-gpu-layers",
+            "999",
+            "--parallel",
+            "1",
+            "--flash-attn",
+            "on",
+            "-fit",
+            "off",
+            "--jinja",
+            "--cont-batching",
+            "--alias",
+            "gpt-oss-20b"
+          ],
+          "env": {},
+          "startup-timeout-seconds": 120,
+          "temp": 0.7,
+          "max-tokens": 4096
+        },
+        {
+          "model-name": "glm-ocr",
+          "base-url": "http://127.0.0.1:8081/v1",
+          "command": "/Users/pooriayousefi/llama.cpp/build/bin/llama-server",
+          "args": [
+            "--model",
+            "/Users/pooriayousefi/llms/GLM-OCR/GLM-OCR-f16.gguf",
+            "--mmproj",
+            "/Users/pooriayousefi/llms/GLM-OCR/mmproj-GLM-OCR-Q8_0.gguf",
+            "--host",
+            "127.0.0.1",
+            "--port",
+            "8081",
+            "--ctx-size",
+            "65536",
+            "--batch-size",
+            "512",
+            "--n-gpu-layers",
+            "999",
+            "--parallel",
+            "1",
+            "--flash-attn",
+            "on",
+            "-fit",
+            "off",
+            "--alias",
+            "glm-ocr"
+          ],
+          "env": {},
+          "startup-timeout-seconds": 120,
+          "temp": 0.7,
+          "max-tokens": 4096
+        },
+        {
+          "model-name": "gemma-4-12b",
+          "base-url": "http://127.0.0.1:8082/v1",
+          "command": "/Users/pooriayousefi/llama.cpp/build/bin/llama-server",
+          "args": [
+            "--model",
+            "/Users/pooriayousefi/llms/gemma-4/gemma-4-12b-it-UD-Q8_K_XL.gguf",
+            "--mmproj",
+            "/Users/pooriayousefi/llms/gemma-4/mmproj-F32.gguf",
+            "--model-draft",
+            "/Users/pooriayousefi/llms/gemma-4/mtp-gemma-4-12B-it.gguf",
+            "--ctx-size",
+            "65536",
+            "--batch-size",
+            "1024",
+            "--n-gpu-layers",
+            "999",
+            "--parallel",
+            "1",
+            "--host",
+            "127.0.0.1",
+            "--port",
+            "8082",
+            "--jinja",
+            "--reasoning",
+            "on",
+            "--alias",
+            "gemma-4-12b"
+          ],
+          "env": {},
+          "startup-timeout-seconds": 120,
+          "temp": 0.7,
+          "max-tokens": 4096
+        }
+      ]
+    }
+  ]
+}
