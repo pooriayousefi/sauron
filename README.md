@@ -1,3 +1,5 @@
+<img width="508" height="337" alt="sauron_banner_animated" src="https://github.com/user-attachments/assets/feadd9a2-61e1-435f-ac09-1aef26e1df57" />
+
 # SAURON
 
 **Specialized Autonomous Units for Reasoning, Orchestration, and Navigation**
