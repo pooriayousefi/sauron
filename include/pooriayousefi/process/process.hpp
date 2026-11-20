@@ -1,4 +1,11 @@
 // ============================================================================
+//  Module: include/pooriayousefi/process/process.hpp
+//  Purpose: Provides cross-platform child-process lifecycle, redirected pipes, and blocking stdin/stdout I/O.
+//  Build: Header-only; compile a consuming executable, e.g. clang++ -std=c++20 -O3 -pthread -I include src/sauron.cpp -o bin/sauron.
+//  Run: Run the consuming executable from the repository root; SAURON configuration lives in cfg/.
+// ============================================================================
+
+// ============================================================================
 //  process.hpp — Cross-Platform Process Management (C++20)
 //  Project: SAURON (Specialized Autonomous Units for Reasoning, Orchestration, and Navigation)
 //  Developed by: Pooria Yousefi
