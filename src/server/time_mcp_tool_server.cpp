@@ -1,26 +1,8 @@
 // ============================================================================
-//  time_mcp_tool_server.cpp — MCP Tool Server for time and dates
-//  Project: SAURON (Specialized Autonomous Units for Reasoning, Orchestration, and Navigation)
-//  Developed by: Pooria Yousefi
-//  License: Apache 2.0
-//
-//  Protocol: MCP 2026-07-28 ONLY (stateless; every request carries _meta).
-//  Transports: stdio (default) or Streamable HTTP.
-//
-//  Tools:
-//    get_current_time    — UTC wall clock, ISO 8601 (millisecond precision)
-//                          plus date/time components.
-//    get_local_time      — Local wall clock, ISO 8601 plus the UTC offset.
-//    get_unix_timestamp  — Seconds and milliseconds since the Unix epoch.
-//
-//  Build:
-//    clang++ -std=c++20 -O3 -pthread -I include src/server/time_mcp_tool_server.cpp -o bin/time_mcp_tool_server
-//    clang++ -std=c++20 -O3 -pthread -I include src/server/time_mcp_tool_server.cpp -o bin/time_mcp_tool_server -lws2_32 (Windows)
-//    g++     -std=c++20 -O3 -pthread -I include src/server/time_mcp_tool_server.cpp -o bin/time_mcp_tool_server
-//
-//  Usage:
-//    ./bin/time_mcp_tool_server                      (stdio; run from project root)
-//    ./bin/time_mcp_tool_server http 127.0.0.1 8091  (Streamable HTTP)
+//  Module: src/server/time_mcp_tool_server.cpp
+//  Purpose: Implements the standalone time MCP tool server and its registered operations.
+//  Build: clang++ -std=c++20 -O3 -pthread -I include src/server/time_mcp_tool_server.cpp -o bin/time_mcp_tool_server
+//  Run: Run from the repository root: ./bin/time_mcp_tool_server.
 // ============================================================================
 
 #include "pooriayousefi/utility/common.hpp"
