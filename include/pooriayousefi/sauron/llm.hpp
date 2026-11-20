@@ -41,6 +41,8 @@ namespace pooriayousefi::llm
         bool stdio_enabled{false};
         bool http_enabled{false};
         std::string command{};
+        std::vector<std::string> args{};
+        std::unordered_map<std::string, std::string> env{};
         std::string host{"127.0.0.1"};
         int port{0};
     };
