@@ -1,38 +1,33 @@
 // ============================================================================
-//  pooriayousefi/sauron/llm.hpp — OpenAI-compatible LLM Client for SAURON
-//  Project: SAURON (Specialized Autonomous Units for Reasoning, Orchestration, and Navigation)
-//  Developed by: Pooria Yousefi
-//  License: Apache 2.0
-//
-//  Build:
-//    (Header-only LLM client)
+//  Module: include/pooriayousefi/sauron/llm.hpp
+//  Purpose: Provider configuration, endpoint validation, chat-completions
+//           requests, and response/tool-call normalization.
+//  Build: Header-only; compile an executable including this header, e.g.:
+//    clang++ -std=c++20 -O3 -pthread -I include src/sauron.cpp -o bin/sauron
+//  Run: Start the selected model server independently, configure
+//       cfg/ai_providers.json, then run from the repository root:
+//    ./bin/sauron --provider local --model gpt-oss-20b
+//  Note: This module never launches, supervises, or terminates model servers.
 // ============================================================================
 
 #pragma once
 
 #include <algorithm>
-#include <array>
 #include <chrono>
 #include <cstddef>
-#include <cstdlib>
-#include <filesystem>
 #include <fstream>
-#include <iostream>
 #include <iterator>
 #include <memory>
 #include <mutex>
 #include <optional>
 #include <string>
 #include <string_view>
-#include <thread>
-#include <unordered_map>
 #include <vector>
 
 #include "nlohmann/json.hpp"
 #include "cpp-httplib/httplib.h"
 #include "pooriayousefi/utility/common.hpp"
 #include "pooriayousefi/utility/expected.hpp"
-#include "pooriayousefi/process/process.hpp"
 
 namespace pooriayousefi::llm
 {
@@ -44,8 +39,6 @@ namespace pooriayousefi::llm
         bool stdio_enabled{false};
         bool http_enabled{false};
         std::string command{};
-        std::vector<std::string> args{};
-        std::unordered_map<std::string, std::string> env{};
         std::string host{"127.0.0.1"};
         int port{0};
     };
@@ -241,12 +234,11 @@ namespace pooriayousefi::llm
     struct ProviderConfig
     {
         std::string name{}, type{"openai-compatible"};
-        std::string base_url{}, model_name{}, api_key{}, api_key_env{}, command{};
+        std::string base_url{}, model_name{}, api_key{}, api_key_env{};
         std::vector<std::string> args{};
         std::unordered_map<std::string, std::string> env{};
         double temperature{0.7};
         int max_tokens{4096};
-        int startup_timeout_seconds{30};
     };
 
     struct BaseURLParts
@@ -449,52 +441,6 @@ namespace pooriayousefi::llm
                 {
                     config.max_tokens = (*selected_model)["max-tokens"].get<int>();
                 }
-                if (selected_model->contains("startup-timeout-seconds") &&
-                    (*selected_model)["startup-timeout-seconds"].is_number_integer())
-                {
-                    config.startup_timeout_seconds =
-                        (*selected_model)["startup-timeout-seconds"].get<int>();
-                }
-                if (selected_model->contains("command") &&
-                    (*selected_model)["command"].is_string())
-                {
-                    config.command = (*selected_model)["command"].get<std::string>();
-                }
-                if (selected_model->contains("args"))
-                {
-                    if (!(*selected_model)["args"].is_array())
-                    {
-                        result.set_error("Provider args must be an array of strings.");
-                        return result;
-                    }
-                    for (const Json& arg : (*selected_model)["args"])
-                    {
-                        if (!arg.is_string())
-                        {
-                            result.set_error("Provider args must be an array of strings.");
-                            return result;
-                        }
-                        config.args.push_back(arg.get<std::string>());
-                    }
-                }
-                if (selected_model->contains("env"))
-                {
-                    if (!(*selected_model)["env"].is_object())
-                    {
-                        result.set_error("Provider env must be an object of string values.");
-                        return result;
-                    }
-                    for (auto it = (*selected_model)["env"].begin();
-                         it != (*selected_model)["env"].end(); ++it)
-                    {
-                        if (!it.value().is_string())
-                        {
-                            result.set_error("Provider env values must be strings.");
-                            return result;
-                        }
-                        config.env.emplace(it.key(), it.value().get<std::string>());
-                    }
-                }
                 const Json* api_key_env = nullptr;
                 if (selected_model->contains("api-key-env"))
                 {
@@ -520,11 +466,6 @@ namespace pooriayousefi::llm
                         return result;
                     }
                     config.api_key = api_key;
-                }
-                if (!config.command.empty() && config.startup_timeout_seconds < 1)
-                {
-                    result.set_error("Provider startup-timeout-seconds must be positive.");
-                    return result;
                 }
                 result.set_value(std::move(config));
             }
@@ -569,77 +510,6 @@ namespace pooriayousefi::llm
         return result;
     }
 
-    [[nodiscard]] inline std::string shell_quote(std::string_view value)
-    {
-        std::string quoted{"'"};
-        for (const char character : value)
-        {
-            if (character == '\'')
-            {
-                quoted += "'\\''";
-            }
-            else
-            {
-                quoted.push_back(character);
-            }
-        }
-        quoted.push_back('\'');
-        return quoted;
-    }
-
-#if defined(__APPLE__)
-    [[nodiscard]] inline std::string applescript_quote(std::string_view value)
-    {
-        std::string quoted{};
-        quoted.reserve(value.size());
-        for (const char character : value)
-        {
-            if (character == '\\' || character == '"')
-            {
-                quoted.push_back('\\');
-            }
-            quoted.push_back(character);
-        }
-        return quoted;
-    }
-
-    [[nodiscard]] inline Expected<void, std::string>
-    open_log_terminal(
-        const std::filesystem::path& log_path,
-        process::process_id_type provider_pid
-    )
-    {
-        Expected<void, std::string> result{};
-        const std::string tail_command =
-            "/usr/bin/tail -n +1 -f " + shell_quote(log_path.string()) +
-            " & log_tail_pid=$!; while /bin/kill -0 " +
-            std::to_string(provider_pid) +
-            " 2>/dev/null; do /bin/sleep 1; done; /bin/sleep 1; "
-            "/bin/kill \"$log_tail_pid\" 2>/dev/null; "
-            "wait \"$log_tail_pid\" 2>/dev/null; "
-            "printf '\\nllama-server has stopped.\\n'; exit";
-        const std::string apple_script =
-            "tell application \"Terminal\" to do script \"" +
-            applescript_quote(tail_command) + "\"";
-
-        process::Process terminal_launcher{};
-        const std::vector<std::string> arguments{"-e", apple_script};
-        terminal_launcher.start("/usr/bin/osascript", arguments, true);
-        const std::string output = terminal_launcher.read_all_stdout();
-        const int exit_code = terminal_launcher.wait();
-        if (exit_code != 0)
-        {
-            result.set_error("Could not open a Terminal window for llama-server logs" +
-                             (output.empty() ? std::string{"."} : ": " + output));
-        }
-        else
-        {
-            result.set_value();
-        }
-        return result;
-    }
-#endif
-
     class Client
     {
     private:
@@ -647,8 +517,6 @@ namespace pooriayousefi::llm
         std::string chat_completions_path_{};
         std::string models_path_{};
         std::unique_ptr<httplib::Client> client_{nullptr};
-        std::unique_ptr<process::Process> provider_process_{nullptr};
-        std::thread provider_output_thread_{};
         std::mutex mutex_{};
 
         [[nodiscard]] static Json error(std::string message)
@@ -685,68 +553,7 @@ namespace pooriayousefi::llm
                 client_->set_read_timeout(std::chrono::seconds(300));
                 client_->set_write_timeout(std::chrono::seconds(60));
             }
-            if (!config_.command.empty())
-            {
-                const auto log_directory = std::filesystem::temp_directory_path() / "sauron";
-                std::filesystem::create_directories(log_directory);
-                const auto log_stamp =
-                    std::chrono::steady_clock::now().time_since_epoch().count();
-                const auto log_path = log_directory /
-                    ("llama-server-" + std::to_string(log_stamp) + ".log");
-                std::ofstream log_file{log_path, std::ios::binary | std::ios::trunc};
-                if (!log_file.is_open())
-                {
-                    throw std::runtime_error(
-                        "Could not open llama-server log file '" + log_path.string() + "'.");
-                }
 
-                provider_process_ = std::make_unique<process::Process>();
-                provider_process_->start(config_.command, config_.args, true, config_.env);
-                provider_output_thread_ = std::thread([this, log_path, log_file = std::move(log_file)]() mutable
-                {
-                    std::array<std::byte, 4096> buffer{};
-                    bool log_write_failed{false};
-                    while (true)
-                    {
-                        const auto read = provider_process_->read_stdout(buffer);
-                        if (!read.has_value())
-                        {
-                            std::cerr << "[LLM] Failed to read provider output: "
-                                      << read.get_error().message() << '\n';
-                            break;
-                        }
-                        if (read.get_value() == 0)
-                        {
-                            break;
-                        }
-                        if (!log_write_failed)
-                        {
-                            log_file.write(
-                                reinterpret_cast<const char*>(buffer.data()),
-                                static_cast<std::streamsize>(read.get_value()));
-                            log_file.flush();
-                            if (!log_file)
-                            {
-                                log_write_failed = true;
-                                std::cerr << "[LLM] Failed writing provider logs to '"
-                                          << log_path.string() << "'.\n";
-                            }
-                        }
-                    }
-                });
-#if defined(__APPLE__)
-                const auto terminal = open_log_terminal(log_path, provider_process_->pid());
-                if (!terminal.has_value())
-                {
-                    std::cerr << "[LLM] " << terminal.get_error() << '\n';
-                    std::cerr << "[LLM] Provider logs are being saved to '"
-                              << log_path.string() << "'.\n";
-                }
-#else
-                std::cout << "[LLM] Provider logs are being saved to '"
-                          << log_path.string() << "'.\n";
-#endif
-            }
         }
 
         Client() = delete;
@@ -754,19 +561,6 @@ namespace pooriayousefi::llm
         Client &operator=(const Client &) = delete;
         Client(Client &&) = delete;
         Client &operator=(Client &&) = delete;
-        ~Client()
-        {
-            if (provider_process_)
-            {
-                provider_process_->terminate_and_wait_keep_stdout();
-            }
-            if (provider_output_thread_.joinable())
-            {
-                provider_output_thread_.join();
-            }
-            provider_process_.reset();
-        }
-
         [[nodiscard]] Expected<void, std::string> verify_connection()
         {
             Expected<void, std::string> result{};
@@ -781,45 +575,33 @@ namespace pooriayousefi::llm
             }
             else
             {
-                const auto deadline = std::chrono::steady_clock::now() +
-                    std::chrono::seconds(provider_process_ ? config_.startup_timeout_seconds : 0);
-                while (true)
+                std::optional<int> response_status{};
                 {
-                    std::optional<int> response_status{};
+                    std::lock_guard<std::mutex> lock(mutex_);
+                    httplib::Headers headers{};
+                    if (!config_.api_key.empty())
                     {
-                        std::lock_guard<std::mutex> lock(mutex_);
-                        httplib::Headers headers{};
-                        if (!config_.api_key.empty())
-                        {
-                            headers.emplace("Authorization", "Bearer " + config_.api_key);
-                        }
-
-                        const auto response = client_->Get(models_path_, headers);
-                        if (response)
-                        {
-                            response_status = response->status;
-                        }
+                        headers.emplace("Authorization", "Bearer " + config_.api_key);
                     }
-                    if (response_status && *response_status >= 200 && *response_status < 300)
+                    const auto response = client_->Get(models_path_, headers);
+                    if (response)
                     {
-                        result.set_value();
-                        break;
+                        response_status = response->status;
                     }
-                    if (response_status && (*response_status == 401 || *response_status == 403))
-                    {
-                        result.set_error("LLM endpoint rejected API key.");
-                        break;
-                    }
-                    if (provider_process_ && provider_process_->running() &&
-                        std::chrono::steady_clock::now() < deadline)
-                    {
-                        std::this_thread::sleep_for(std::chrono::milliseconds(250));
-                        continue;
-                    }
+                }
+                if (response_status && *response_status >= 200 && *response_status < 300)
+                {
+                    result.set_value();
+                }
+                else if (response_status && (*response_status == 401 || *response_status == 403))
+                {
+                    result.set_error("LLM endpoint rejected API key.");
+                }
+                else
                     if (!response_status)
                     {
                         result.set_error("Cannot reach LLM endpoint '" + config_.base_url +
-                                         "'. Check the provider command and endpoint.");
+                                         "'. Start the model server independently and verify its host, port, and API route.");
                     }
                     else
                     {
