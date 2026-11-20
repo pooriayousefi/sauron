@@ -10,7 +10,7 @@
 //    For HTTPS providers, add -DCPPHTTPLIB_OPENSSL_SUPPORT -lssl -lcrypto.
 //
 //  Run:
-//    ./bin/test_sauron_agent --provider NAME --model NAME
+//    ./bin/test_sauron_agent --agent orchestrator --provider NAME --model NAME
 // ============================================================================
 
 #include <iostream>
@@ -22,12 +22,17 @@ using namespace pooriayousefi;
 int main(int argc, char* argv[])
 {
     int exit_code{0};
+    std::string agent_name{"orchestrator"};
     std::string provider_name{};
     std::string model_name{};
     for (int index = 1; index + 1 < argc; ++index)
     {
         const std::string option{argv[index]};
-        if (option == "--provider")
+        if (option == "--agent")
+        {
+            agent_name = argv[++index];
+        }
+        else if (option == "--provider")
         {
             provider_name = argv[++index];
         }
@@ -38,7 +43,8 @@ int main(int argc, char* argv[])
     }
     if (provider_name.empty() || model_name.empty())
     {
-        std::cerr << "Usage: " << argv[0] << " --provider NAME --model NAME\n";
+        std::cerr << "Usage: " << argv[0]
+                  << " [--agent NAME] --provider NAME --model NAME\n";
         return 2;
     }
 
@@ -54,8 +60,8 @@ int main(int argc, char* argv[])
 
     sauron::Agent::Config agent_config{};
     agent_config.llm = llm_config_res.get_value();
-    agent_config.id = "orchestrator";
-    auto prompt_res = llm::load_system_prompt("cfg/system_prompts.json", "orchestrator");
+    agent_config.id = agent_name;
+    auto prompt_res = llm::load_system_prompt("cfg/system_prompts.json", agent_name);
     if (!prompt_res.has_value())
     {
         std::cerr << "[SAURON] Error loading system prompt: " << prompt_res.get_error() << "\n";

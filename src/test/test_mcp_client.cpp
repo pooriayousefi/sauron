@@ -22,9 +22,9 @@ int main()
     using namespace pooriayousefi;
 
     int exit_code{0};
-    std::cout << "[test_mcp_client] Connecting to MCP Server at http://127.0.0.1:8080 ...\n";
+    std::cout << "[test_mcp_client] Connecting to MCP Server at http://127.0.0.1:8082 ...\n";
 
-    mcp::Client client{"127.0.0.1", 8080};
+    mcp::Client client{"127.0.0.1", 8082};
 
     auto tools_res = client.list_tools();
     if (tools_res.has_value())

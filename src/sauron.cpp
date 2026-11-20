@@ -4,7 +4,7 @@
 //  Build: clang++ -std=c++20 -O3 -pthread -I include src/sauron.cpp -o bin/sauron
 //  Run: Start an OpenAI-compatible model server independently, configure
 //       cfg/ai_providers.json, then run from the repository root:
-//    ./bin/sauron --provider local --model gpt-oss-20b
+//    ./bin/sauron --agent orchestrator --provider local --model gpt-oss-20b
 // ============================================================================
 #include "pooriayousefi/sauron/agent.hpp"
 
@@ -18,9 +18,10 @@ namespace
     void print_usage(std::ostream& output, std::string_view executable)
     {
         output << "Usage: " << executable
-               << " --provider NAME --model NAME\n"
+               << " [--agent NAME] --provider NAME --model NAME\n"
                   "\n"
                   "Options:\n"
+                  "  --agent NAME       Agent prompt name from system_prompts.json (default: orchestrator)\n"
                   "  --provider NAME    Provider name from ai_providers.json (required)\n"
                   "  --model NAME       Model name configured for that provider (required)\n"
                   "  --help             Show this help\n"
@@ -31,7 +32,7 @@ namespace
                   "  SAURON loads the selected provider/model from the provider config.\n"
                   "  The selected model server must already be running; SAURON only connects to it.\n"
                   "  SAURON then starts/connects enabled MCP servers from the MCP config.\n"
-                  "  The orchestrator prompt is loaded automatically; the chat starts\n"
+                  "  The selected agent prompt is loaded automatically; the chat starts\n"
                   "  only after the LLM endpoint and all enabled MCP servers are ready.\n"
                   "\n"
                   "Chat commands:\n"
@@ -44,7 +45,7 @@ int main(int argc, char* argv[])
 {
     using namespace pooriayousefi;
 
-    const std::string agent_name{"orchestrator"};
+    std::string agent_name{"orchestrator"};
     std::string provider_name{};
     std::string model_name{};
     constexpr std::string_view provider_config{"cfg/ai_providers.json"};
@@ -67,7 +68,11 @@ int main(int argc, char* argv[])
         }
 
         const std::string value{argv[++index]};
-        if (option == "--provider")
+        if (option == "--agent")
+        {
+            agent_name = value;
+        }
+        else if (option == "--provider")
         {
             provider_name = value;
         }
@@ -83,9 +88,9 @@ int main(int argc, char* argv[])
         }
     }
 
-    if (provider_name.empty() || model_name.empty())
+    if (agent_name.empty() || provider_name.empty() || model_name.empty())
     {
-        std::cerr << "Both --provider and --model are required.\n";
+        std::cerr << "Both --provider and --model are required, and --agent must not be empty.\n";
         print_usage(std::cerr, argv[0]);
         return 2;
     }
@@ -116,7 +121,7 @@ int main(int argc, char* argv[])
 
     try
     {
-        std::cout << "Starting orchestrator with provider '" << provider_name
+        std::cout << "Starting " << agent_name << " with provider '" << provider_name
                   << "' and model '" << model_name << "'.\n";
         sauron::Agent agent{std::move(config)};
         const auto setup = agent.setup();

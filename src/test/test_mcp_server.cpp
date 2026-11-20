@@ -9,7 +9,7 @@
 //    g++     -std=c++20 -O3 -pthread -I include src/test/test_mcp_server.cpp -o bin/test_mcp_server
 //
 //  Run:
-//    ./bin/test_mcp_server (starts the demo server on 127.0.0.1:8080)
+//    ./bin/test_mcp_server (starts the demo server on 127.0.0.1:8082)
 // ============================================================================
 
 #include <iostream>
@@ -20,7 +20,7 @@ int main()
 {
     using namespace pooriayousefi;
     int exit_code{0};
-    std::cout << "[test_mcp_server] Starting MCP Server (2026-07-28 stateless spec) on http://127.0.0.1:8080/mcp ...\n";
+    std::cout << "[test_mcp_server] Starting MCP Server (2026-07-28 stateless spec) on http://127.0.0.1:8082/mcp ...\n";
 
     mcp::Server server{};
 
@@ -104,9 +104,9 @@ int main()
 
     try
     {
-        if (!server.start_http("127.0.0.1", 8080))
+        if (!server.start_http("127.0.0.1", 8082))
         {
-            std::cerr << "[test_mcp_server] Failed to listen on 127.0.0.1:8080\n";
+            std::cerr << "[test_mcp_server] Failed to listen on 127.0.0.1:8082\n";
             exit_code = 1;
         }
     }
