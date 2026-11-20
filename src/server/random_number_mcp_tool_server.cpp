@@ -1,34 +1,8 @@
 // ============================================================================
-//  random_number_mcp_tool_server.cpp — MCP Tool Server for random distributions
-//  Project: SAURON (Specialized Autonomous Units for Reasoning, Orchestration, and Navigation)
-//  Developed by: Pooria Yousefi
-//  License: Apache 2.0
-//
-//  Protocol: MCP 2026-07-28 ONLY (stateless; every request carries _meta).
-//  Transports: stdio (default) or Streamable HTTP.
-//
-//  Tools (sampling):
-//    random_uniform_int, random_uniform_real, random_bernoulli,
-//    random_binomial, random_geometric, random_negative_binomial,
-//    random_poisson, random_exponential, random_gamma, random_weibull,
-//    random_extreme_value, random_normal, random_lognormal,
-//    random_chi_squared, random_cauchy, random_fisher_f, random_student_t
-//
-//  Safety:
-//    - Thread-local mt19937_64 engine seeded from std::random_device
-//    - Hard cap of 100000 samples per call ('count' <= 100000)
-//    - Parameters validated before sampling (p in [0,1], positive shape,
-//      scale and degrees of freedom, non-negative mean)
-//    - Single value response for count=1, values array otherwise
-//
-//  Build:
-//    clang++ -std=c++20 -O3 -pthread -I include src/server/random_number_mcp_tool_server.cpp -o bin/random_number_mcp_tool_server
-//    clang++ -std=c++20 -O3 -pthread -I include src/server/random_number_mcp_tool_server.cpp -o bin/random_number_mcp_tool_server -lws2_32 (Windows)
-//    g++     -std=c++20 -O3 -pthread -I include src/server/random_number_mcp_tool_server.cpp -o bin/random_number_mcp_tool_server
-//
-//  Usage:
-//    ./bin/random_number_mcp_tool_server                      (stdio; run from project root)
-//    ./bin/random_number_mcp_tool_server http 127.0.0.1 8095  (Streamable HTTP)
+//  Module: src/server/random_number_mcp_tool_server.cpp
+//  Purpose: Implements the standalone random number MCP tool server and its registered operations.
+//  Build: clang++ -std=c++20 -O3 -pthread -I include src/server/random_number_mcp_tool_server.cpp -o bin/random_number_mcp_tool_server
+//  Run: Run from the repository root: ./bin/random_number_mcp_tool_server.
 // ============================================================================
 
 #include "pooriayousefi/utility/common.hpp"
