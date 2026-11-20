@@ -1,23 +1,11 @@
 // ============================================================================
-//  src/sauron.cpp — SAURON multi-turn agent runtime
+//  Module: src/sauron.cpp
+//  Purpose: SAURON command-line entry point and interactive orchestrator loop.
+//  Build: clang++ -std=c++20 -O3 -pthread -I include src/sauron.cpp -o bin/sauron
+//  Run: Start an OpenAI-compatible model server independently, configure
+//       cfg/ai_providers.json, then run from the repository root:
+//    ./bin/sauron --provider local --model gpt-oss-20b
 // ============================================================================
-
-// ============================================================================
-//  src/sauron.cpp — SAURON interactive agent runtime
-//  Project: SAURON (Specialized Autonomous Units for Reasoning,
-//           Orchestration, and Navigation)
-//  License: Apache 2.0
-//
-//  Build:
-//    clang++ -std=c++20 -O3 -pthread -I include src/sauron.cpp -o bin/sauron
-//    g++     -std=c++20 -O3 -pthread -I include src/sauron.cpp -o bin/sauron
-//    For HTTPS providers, add -DCPPHTTPLIB_OPENSSL_SUPPORT -lssl -lcrypto.
-//
-//  Run (from the project root):
-//    ./bin/sauron --provider openai --model gpt-6-luna
-//    ./bin/sauron --help
-// ============================================================================
-
 #include "pooriayousefi/sauron/agent.hpp"
 
 #include <exception>
@@ -41,10 +29,10 @@ namespace
                   "  Configuration is read from cfg/ai_providers.json,\n"
                   "  cfg/system_prompts.json, and cfg/mcp_servers.json.\n"
                   "  SAURON loads the selected provider/model from the provider config.\n"
-                  "  If that model has a command, SAURON starts it and waits for its endpoint.\n"
+                  "  The selected model server must already be running; SAURON only connects to it.\n"
                   "  SAURON then starts/connects enabled MCP servers from the MCP config.\n"
                   "  The orchestrator prompt is loaded automatically; the chat starts\n"
-                  "  only after the LLM and all enabled MCP servers are ready.\n"
+                  "  only after the LLM endpoint and all enabled MCP servers are ready.\n"
                   "\n"
                   "Chat commands:\n"
                   "  /help            Show this help without querying the model\n"
