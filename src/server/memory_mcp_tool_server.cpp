@@ -1,34 +1,8 @@
 // ============================================================================
-//  memory_mcp_tool_server.cpp — MCP Tool Server for long-term key-value memory
-//  Project: SAURON (Specialized Autonomous Units for Reasoning, Orchestration, and Navigation)
-//  Developed by: Pooria Yousefi
-//  License: Apache 2.0
-//
-//  Protocol: MCP 2026-07-28 ONLY (stateless; every request carries _meta).
-//  Transports: stdio (default) or Streamable HTTP.
-//
-//  Tools (read):
-//    recall_memory, list_keys
-//
-//  Tools (write):
-//    save_memory
-//
-//  Safety:
-//    - Copy-on-write Json state shared via smart pointers (no raw pointers)
-//    - Mutex-guarded snapshot reads and writes
-//    - Observer watchers persist the full state to disk after every mutation
-//    - Default store file: sauron_memory.json (working directory)
-//    - Reads the previous mcpxx_memory.json file when the new store is absent
-//    - Values are arbitrary Json (string, number, object, array, etc.)
-//
-//  Build:
-//    clang++ -std=c++20 -O3 -pthread -I include src/server/memory_mcp_tool_server.cpp -o bin/memory_mcp_tool_server
-//    clang++ -std=c++20 -O3 -pthread -I include src/server/memory_mcp_tool_server.cpp -o bin/memory_mcp_tool_server -lws2_32 (Windows)
-//    g++     -std=c++20 -O3 -pthread -I include src/server/memory_mcp_tool_server.cpp -o bin/memory_mcp_tool_server
-//
-//  Usage:
-//    ./bin/memory_mcp_tool_server                      (stdio; run from project root)
-//    ./bin/memory_mcp_tool_server http 127.0.0.1 8097  (Streamable HTTP)
+//  Module: src/server/memory_mcp_tool_server.cpp
+//  Purpose: Implements the standalone memory MCP tool server and its registered operations.
+//  Build: clang++ -std=c++20 -O3 -pthread -I include src/server/memory_mcp_tool_server.cpp -o bin/memory_mcp_tool_server
+//  Run: Run from the repository root: ./bin/memory_mcp_tool_server.
 // ============================================================================
 
 #include "pooriayousefi/utility/common.hpp"

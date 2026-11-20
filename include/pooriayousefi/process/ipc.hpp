@@ -1,4 +1,11 @@
 // ============================================================================
+//  Module: include/pooriayousefi/process/ipc.hpp
+//  Purpose: Provides cross-platform inter-process communication helpers for child-process pipes.
+//  Build: Header-only; build a consuming executable, e.g. clang++ -std=c++20 -O3 -pthread -I include src/sauron.cpp -o bin/sauron.
+//  Run: Run the consuming executable from the repository root after configuring cfg/ai_providers.json and cfg/mcp_servers.json.
+// ============================================================================
+
+// ============================================================================
 //  ipc.hpp — Higher-level Inter-Process Communication built on process.hpp
 //  Project: SAURON (Specialized Autonomous Units for Reasoning, Orchestration, and Navigation)
 //  Developed by: Pooria Yousefi

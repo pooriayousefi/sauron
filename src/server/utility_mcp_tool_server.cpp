@@ -1,4 +1,12 @@
 // ============================================================================
+//  Module: src/server/utility_mcp_tool_server.cpp
+//  Purpose: Implements the standalone utility MCP tool server and its registered operations.
+//  Build: clang++ -std=c++20 -O3 -pthread -I include src/server/utility_mcp_tool_server.cpp -o bin/utility_mcp_tool_server
+//  Run: From the repository root: ./bin/utility_mcp_tool_server (stdio mode); configure
+//       cfg/mcp_servers.json to let SAURON launch this MCP server.
+// ============================================================================
+
+// ============================================================================
 //  utility_mcp_tool_server.cpp — MCP Tool Server for String / Json / UUID Utilities
 //  Project: SAURON (Specialized Autonomous Units for Reasoning, Orchestration, and Navigation)
 //  Developed by: Pooria Yousefi

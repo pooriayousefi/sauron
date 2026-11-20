@@ -41,8 +41,8 @@ executable directly.
 - For HTTPS LLM providers, build cpp-httplib with SSL support and link OpenSSL:
   `-DCPPHTTPLIB_OPENSSL_SUPPORT -lssl -lcrypto` (and the appropriate OpenSSL
   include/library paths for your system).
-- An OpenAI-compatible chat-completions endpoint. This may be a hosted API or
-  a local server such as `llama-server`.
+- An already-running OpenAI-compatible chat-completions endpoint. SAURON never
+  launches, supervises, or stops an inference server; the user owns its lifecycle.
 
 Build and run commands that refer to `cfg/` or `bin/` assume the working
 directory is the repository root.
@@ -81,13 +81,13 @@ The main executable reads these paths relative to the project root:
 
 | File | Purpose |
 | --- | --- |
-| `cfg/ai_providers.json` | Provider, model, base URL, optional API key and optional local-server launch command |
+| `cfg/ai_providers.json` | Provider, model, endpoint URL, and optional API-key environment variable |
 | `cfg/system_prompts.json` | The orchestrator's system prompt |
 | `cfg/mcp_servers.json` | MCP server commands, environment variables, and transports |
 
-The checked-in provider file contains an `openai` provider and a
-`llama-server` provider. Select both the provider's `name` and one of its
-models' `model-name` values on the command line.
+The checked-in provider file contains an `openai` provider and a `local`
+OpenAI-compatible provider with example endpoints. Select the provider's
+`name` and one of its models' `model-name` values on the command line.
 
 ### Hosted OpenAI-compatible API
 
@@ -107,20 +107,29 @@ file or commit one to the repository.
 
 ### Local OpenAI-compatible model server
 
-The sample `llama-server` model entries include machine-specific paths for the
-server executable and model files. Edit `command`, `args`, `env`,
-`startup-timeout-seconds`, and `base-url` to match your local installation.
-When `command` is configured, SAURON starts that process and waits for its
-configured endpoint before connecting to MCP servers.
+Start the inference server yourself before launching SAURON. This can be
+`llama-server`, vLLM, Ollama (with an OpenAI-compatible endpoint), or any
+other compatible implementation. SAURON does not launch or stop these
+processes and does not require a particular inference engine.
 
-For example, after adapting one model's command, arguments, and model name:
+1. Start your chosen model server independently, using the model and runtime
+   options appropriate for your machine.
+2. Edit the selected model entry under the `local` provider in
+   `cfg/ai_providers.json`. Set `base-url` to the server's OpenAI-compatible
+   API base URL (including `/v1` when required), and `model-name`
+   to the model identifier accepted by that endpoint.
+3. If authentication is required, configure `api-key-env` and export the
+   corresponding environment variable.
+4. Confirm the server is reachable, then launch SAURON:
 
 ```sh
-./bin/sauron --provider llama-server --model gpt-oss-20b
+./bin/sauron --provider local --model gpt-oss-20b
 ```
 
-Use the exact provider/model names from your JSON file. Use `--help` to display
-the executable's options. Chat commands are `/help`, `/exit`, and `/quit`.
+For a server listening on `127.0.0.1:8080`, the base URL is commonly
+`http://127.0.0.1:8080/v1`. The model server must already be ready when
+SAURON starts. Connection failures are reported; SAURON does not start the
+server or wait for it to become available.
 
 ## Configure MCP tools
 
@@ -246,7 +255,7 @@ These are executable demos, not a standalone automated unit-test suite.
 
 - MCP messages use JSON-RPC 2.0 and this runtime's configured protocol version
   `2026-07-28`, including the required protocol/client metadata on requests.
-- The LLM client sends OpenAI-compatible chat-completions requests and reads
+- The LLM client connects only to the configured, already-running OpenAI-compatible endpoint, sends chat-completions requests, and reads
   function/tool calls from model responses.
 - Tool calls are routed to the MCP client that advertised each tool. Duplicate
   tool names from later servers are skipped.

@@ -1,11 +1,8 @@
 // ============================================================================
-//  pooriayousefi/sauron/agent.hpp — SAURON Single Agent Runtime (Stateless MCP 2026-07-28)
-//  Project: SAURON (Specialized Autonomous Units for Reasoning, Orchestration, and Navigation)
-//  Developed by: Pooria Yousefi
-//  License: Apache 2.0
-//
-//  Build:
-//    (Header-only agent runtime)
+//  Module: include/pooriayousefi/sauron/agent.hpp
+//  Purpose: Implements the SAURON agent lifecycle, MCP tool discovery and dispatch, conversation management, and orchestration.
+//  Build: Header-only; compile a consuming executable: clang++ -std=c++20 -O3 -pthread -I include src/sauron.cpp -o bin/sauron.
+//  Run: Run the consuming executable from the repository root with configuration files under cfg/.
 // ============================================================================
 
 #pragma once

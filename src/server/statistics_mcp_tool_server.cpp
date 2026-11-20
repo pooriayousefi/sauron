@@ -1,4 +1,12 @@
 // ============================================================================
+//  Module: src/server/statistics_mcp_tool_server.cpp
+//  Purpose: Implements the standalone statistics MCP tool server and its registered operations.
+//  Build: clang++ -std=c++20 -O3 -pthread -I include src/server/statistics_mcp_tool_server.cpp -o bin/statistics_mcp_tool_server
+//  Run: From the repository root: ./bin/statistics_mcp_tool_server (stdio mode); configure
+//       cfg/mcp_servers.json to let SAURON launch this MCP server.
+// ============================================================================
+
+// ============================================================================
 //  statistics_mcp_tool_server.cpp — MCP Tool Server for Statistics
 //  Project: SAURON (Specialized Autonomous Units for Reasoning, Orchestration, and Navigation)
 //  Developed by: Pooria Yousefi

@@ -1,4 +1,11 @@
 // ============================================================================
+//  Module: src/server/file_mcp_tool_server.cpp
+//  Purpose: Implements the standalone file MCP tool server and its registered operations.
+//  Build: clang++ -std=c++20 -O3 -pthread -I include src/server/file_mcp_tool_server.cpp -o bin/file_mcp_tool_server
+//  Run: Run from the repository root: ./bin/file_mcp_tool_server (stdio mode); configure cfg/mcp_servers.json to launch it.
+// ============================================================================
+
+// ============================================================================
 //  src/server/file_mcp_tool_server.cpp — MCP Tool Server for file manipulation
 //  Project: SAURON (Specialized Autonomous Units for Reasoning, Orchestration, and Navigation)
 //  Developed by: Pooria Yousefi

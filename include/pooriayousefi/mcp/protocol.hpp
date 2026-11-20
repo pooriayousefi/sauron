@@ -1,4 +1,11 @@
 // ============================================================================
+//  Module: include/pooriayousefi/mcp/protocol.hpp
+//  Purpose: Defines MCP JSON-RPC messages, protocol metadata, tool schemas, and serialization helpers.
+//  Build: Header-only; build a consuming executable, e.g. clang++ -std=c++20 -O3 -pthread -I include src/sauron.cpp -o bin/sauron.
+//  Run: Run the consuming executable from the repository root after configuring cfg/ai_providers.json and cfg/mcp_servers.json.
+// ============================================================================
+
+// ============================================================================
 //  pooriayousefi/mcp/protocol.hpp — MCP 2026-07-28 JSON-RPC 2.0 Protocol Structures
 //  Project: SAURON (Specialized Autonomous Units for Reasoning, Orchestration, and Navigation)
 //  Developed by: Pooria Yousefi

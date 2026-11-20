@@ -1,4 +1,11 @@
 // ============================================================================
+//  Module: include/pooriayousefi/utility/expected.hpp
+//  Purpose: Provides the C++20 Expected value-or-error abstraction used across SAURON.
+//  Build: Header-only; build a consuming executable, e.g. clang++ -std=c++20 -O3 -pthread -I include src/sauron.cpp -o bin/sauron.
+//  Run: Run the consuming executable from the repository root after configuring cfg/ai_providers.json and cfg/mcp_servers.json.
+// ============================================================================
+
+// ============================================================================
 //  pooriayousefi/utility/expected.hpp — Expected<value_type, error_type> result type
 //  Project: SAURON (Specialized Autonomous Units for Reasoning, Orchestration, and Navigation)
 //  Developed by: Pooria Yousefi

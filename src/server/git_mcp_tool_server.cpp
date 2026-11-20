@@ -1,36 +1,8 @@
 // ============================================================================
-//  git_mcp_tool_server.cpp — MCP Tool Server for git operations
-//  Project: SAURON (Specialized Autonomous Units for Reasoning, Orchestration, and Navigation)
-//  Developed by: Pooria Yousefi
-//  License: Apache 2.0
-//
-//  Protocol: MCP 2026-07-28 ONLY (stateless; every request carries _meta).
-//  Transports: stdio (default) or Streamable HTTP.
-//
-//  Tools (inspection):
-//    git_status, git_diff, git_log, git_show, git_branch, git_current_branch,
-//    git_remote
-//
-//  Tools (mutation):
-//    git_init, git_add, git_commit, git_checkout, git_create_branch,
-//    git_reset, git_stash
-//
-//  Tools (network):
-//    git_fetch, git_pull, git_push, git_clone
-//
-//  Safety:
-//    - Runs `git` via process.hpp (no shell; argv only)
-//    - Optional "cwd" uses `git -C <path>` (no chdir required)
-//    - Requires `git` on PATH
-//
-//  Build:
-//    clang++ -std=c++20 -O3 -pthread -I include src/server/git_mcp_tool_server.cpp -o bin/git_mcp_tool_server
-//    clang++ -std=c++20 -O3 -pthread -I include src/server/git_mcp_tool_server.cpp -o bin/git_mcp_tool_server -lws2_32 (Windows)
-//    g++     -std=c++20 -O3 -pthread -I include src/server/git_mcp_tool_server.cpp -o bin/git_mcp_tool_server
-//
-//  Usage:
-//    ./bin/git_mcp_tool_server                      (stdio; run from project root)
-//    ./bin/git_mcp_tool_server http 127.0.0.1 8099  (Streamable HTTP)
+//  Module: src/server/git_mcp_tool_server.cpp
+//  Purpose: Implements the standalone git MCP tool server and its registered operations.
+//  Build: clang++ -std=c++20 -O3 -pthread -I include src/server/git_mcp_tool_server.cpp -o bin/git_mcp_tool_server
+//  Run: Run from the repository root: ./bin/git_mcp_tool_server.
 // ============================================================================
 
 #include "pooriayousefi/utility/common.hpp"
