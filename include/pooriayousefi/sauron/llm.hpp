@@ -15,6 +15,7 @@
 #include <algorithm>
 #include <chrono>
 #include <cstddef>
+#include <cstdlib>
 #include <fstream>
 #include <iterator>
 #include <memory>
@@ -235,8 +236,6 @@ namespace pooriayousefi::llm
     {
         std::string name{}, type{"openai-compatible"};
         std::string base_url{}, model_name{}, api_key{}, api_key_env{};
-        std::vector<std::string> args{};
-        std::unordered_map<std::string, std::string> env{};
         double temperature{0.7};
         int max_tokens{4096};
     };
@@ -568,50 +567,47 @@ namespace pooriayousefi::llm
             if (config_.base_url.empty())
             {
                 result.set_error("LLM base Url is empty.");
+                return result;
             }
-            else if (!client_)
+            if (!client_)
             {
                 result.set_error(invalid_base_url_message());
+                return result;
             }
-            else
+
+            std::optional<int> response_status{};
             {
-                std::optional<int> response_status{};
+                std::lock_guard<std::mutex> lock(mutex_);
+                httplib::Headers headers{};
+                if (!config_.api_key.empty())
                 {
-                    std::lock_guard<std::mutex> lock(mutex_);
-                    httplib::Headers headers{};
-                    if (!config_.api_key.empty())
-                    {
-                        headers.emplace("Authorization", "Bearer " + config_.api_key);
-                    }
-                    const auto response = client_->Get(models_path_, headers);
-                    if (response)
-                    {
-                        response_status = response->status;
-                    }
+                    headers.emplace("Authorization", "Bearer " + config_.api_key);
                 }
-                if (response_status && *response_status >= 200 && *response_status < 300)
+                const auto response = client_->Get(models_path_, headers);
+                if (response)
                 {
-                    result.set_value();
-                }
-                else if (response_status && (*response_status == 401 || *response_status == 403))
-                {
-                    result.set_error("LLM endpoint rejected API key.");
-                }
-                else
-                    if (!response_status)
-                    {
-                        result.set_error("Cannot reach LLM endpoint '" + config_.base_url +
-                                         "'. Start the model server independently and verify its host, port, and API route.");
-                    }
-                    else
-                    {
-                        result.set_error("LLM endpoint returned HTTP status " +
-                                         std::to_string(*response_status) + ".");
-                    }
-                    break;
+                    response_status = response->status;
                 }
             }
 
+            if (response_status && *response_status >= 200 && *response_status < 300)
+            {
+                result.set_value();
+            }
+            else if (response_status && (*response_status == 401 || *response_status == 403))
+            {
+                result.set_error("LLM endpoint rejected API key.");
+            }
+            else if (!response_status)
+            {
+                result.set_error("Cannot reach LLM endpoint '" + config_.base_url +
+                                 "'. Start the model server independently and verify its host, port, and API route.");
+            }
+            else
+            {
+                result.set_error("LLM endpoint returned HTTP status " +
+                                 std::to_string(*response_status) + ".");
+            }
             return result;
         }
 
