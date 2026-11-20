@@ -176,9 +176,91 @@ clang++ -std=c++20 -O3 -pthread -I include src/test/test_mcp_server.cpp -o bin/t
 clang++ -std=c++20 -O3 -pthread -I include src/test/test_sauron.cpp -o bin/test_sauron_agent
 ```
 
-For HTTPS model providers, apply the OpenSSL flags above to the SAURON and
-`test_sauron_agent` compile commands. On Windows, add `-lws2_32` to each
-compile/link command.
+### macOS: HTTPS-enabled build
+
+Install OpenSSL with Homebrew, then build SAURON from the repository root.
+The Apple Security and CoreFoundation frameworks are needed by cpp-httplib's
+system certificate loader:
+
+```sh
+brew install openssl@3
+mkdir -p bin
+
+clang++ -std=c++20 -O3 -pthread \
+  -I include \
+  -DCPPHTTPLIB_OPENSSL_SUPPORT \
+  -I "$(brew --prefix openssl@3)/include" \
+  src/sauron.cpp \
+  -o bin/sauron \
+  -L "$(brew --prefix openssl@3)/lib" \
+  -Wl,-rpath,"$(brew --prefix openssl@3)/lib" \
+  -lssl -lcrypto \
+  -framework Security \
+  -framework CoreFoundation
+```
+
+### Ubuntu: HTTPS-enabled build
+
+Install Clang and the OpenSSL development headers/libraries:
+
+```sh
+sudo apt update
+sudo apt install -y clang libssl-dev
+mkdir -p bin
+
+clang++ -std=c++20 -O3 -pthread \
+  -I include \
+  -DCPPHTTPLIB_OPENSSL_SUPPORT \
+  src/sauron.cpp \
+  -o bin/sauron \
+  -lssl -lcrypto
+```
+
+### Windows: HTTPS-enabled build with MSYS2
+
+Open an **MSYS2 UCRT64** terminal, install the compiler and OpenSSL package,
+then build SAURON. The UCRT64 environment supplies the matching include and
+library paths:
+
+```sh
+pacman -S --needed mingw-w64-ucrt-x86_64-gcc mingw-w64-ucrt-x86_64-openssl
+mkdir -p bin
+
+g++ -std=c++20 -O3 -pthread \
+  -I include \
+  -DCPPHTTPLIB_OPENSSL_SUPPORT \
+  src/sauron.cpp \
+  -o bin/sauron.exe \
+  -lssl -lcrypto -lws2_32
+```
+
+The examples above build the SAURON executable. To run the checked-in
+configuration, also build its nine MCP server executables. On macOS or Ubuntu,
+use this loop (from the repository root):
+
+```sh
+for source in src/server/*_mcp_tool_server.cpp; do
+  name=$(basename "$source" .cpp)
+  clang++ -std=c++20 -O3 -pthread -I include "$source" -o "bin/$name"
+done
+```
+
+In the MSYS2 UCRT64 terminal, build the same servers with the Windows socket
+library and `.exe` suffix:
+
+```sh
+for source in src/server/*_mcp_tool_server.cpp; do
+  name=$(basename "$source" .cpp)
+  g++ -std=c++20 -O3 -pthread -I include "$source" -o "bin/$name.exe" -lws2_32
+done
+```
+
+HTTPS support is needed for SAURON when its configured LLM endpoint uses HTTPS;
+it is not needed for the local MCP stdio servers. To build the HTTPS-enabled
+`test_sauron_agent` demo, use the same platform-specific flags and libraries,
+replacing `src/sauron.cpp` and `bin/sauron` with
+`src/test/test_sauron.cpp` and `bin/test_sauron_agent` (or `bin/test_sauron_agent.exe`
+on Windows).
 
 ## Configure providers and prompts
 
@@ -250,6 +332,7 @@ The CLI syntax is:
 `--provider` and `--model` are required. `--agent` is optional and defaults to
 `orchestrator`. The agent value must exactly match a key in
 `cfg/system_prompts.json`. Show CLI help with `./bin/sauron --help`.
+On Windows, use `.\bin\sauron.exe` instead of `./bin/sauron`.
 
 ### Hosted OpenAI-compatible API
 
@@ -262,6 +345,13 @@ The CLI syntax is:
 ```sh
 export OPENAI_API_KEY='<your-api-key>'
 ./bin/sauron --agent orchestrator --provider openai --model gpt-6-luna
+```
+
+In Windows PowerShell, set the environment variable and run the `.exe`:
+
+```powershell
+$env:OPENAI_API_KEY = '<your-api-key>'
+.\bin\sauron.exe --agent orchestrator --provider openai --model gpt-6-luna
 ```
 
 The API key is read from the environment; do not put a real key in the JSON
@@ -286,6 +376,12 @@ processes and does not require a particular inference engine.
 
 ```sh
 ./bin/sauron --agent orchestrator --provider local --model gpt-oss-20b
+```
+
+On Windows PowerShell, run the equivalent command from the repository root:
+
+```powershell
+.\bin\sauron.exe --agent orchestrator --provider local --model gpt-oss-20b
 ```
 
 Use `--agent NAME` to select any prompt key from `cfg/system_prompts.json`,
